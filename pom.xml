@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.movie-netscape</groupId>
-    <artifactId>user-management-service</artifactId>
+    <artifactId>account-management-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>user-management-service</name>
-    <description>user-management-service</description>
+    <description>account-management-service</description>
     <url/>
     <licenses>
         <license/>
@@ -73,6 +73,15 @@
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
         </dependency>
     </dependencies>
 
