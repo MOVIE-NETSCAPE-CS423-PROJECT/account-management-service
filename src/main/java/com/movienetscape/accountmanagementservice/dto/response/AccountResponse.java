@@ -19,9 +19,17 @@ public class AccountResponse {
 
     private String message;
 
-    private String  accountId;
+    private String accountId;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String role;
 
     private String currentAccountPlanName;
+
+    private boolean accountVerified;
 
     private String accountStatus;
 

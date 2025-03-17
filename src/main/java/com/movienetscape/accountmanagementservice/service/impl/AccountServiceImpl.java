@@ -9,6 +9,7 @@ import com.movienetscape.accountmanagementservice.model.Profile;
 import com.movienetscape.accountmanagementservice.repository.AccountRepository;
 import com.movienetscape.accountmanagementservice.service.contract.AccountService;
 import com.movienetscape.accountmanagementservice.util.AccountStatus;
+import com.movienetscape.accountmanagementservice.util.enums.Role;
 import com.movienetscape.accountmanagementservice.util.exception.DuplicateException;
 import com.movienetscape.accountmanagementservice.util.exception.IllegalOperationException;
 import com.movienetscape.accountmanagementservice.util.exception.NotFoundException;
@@ -34,15 +35,17 @@ public class AccountServiceImpl implements AccountService {
             throw new DuplicateException("Account with this email already exists.");
         }
 
-        Plan plan = createAccountRequest.getPlan();
+        Plan plan = createAccountRequest.getUserSelectedPlan();
         Account newAccount = new Account();
-        newAccount.setUserId(createAccountRequest.getUserId());
         newAccount.initializeAccount(plan.getPlanName(),
+                createAccountRequest.getUserId(),
                 plan.getMaxMoviesPerProfileOnActiveSubscription(),
-                plan.getMaxMoviesPerProfileOnNotActiveSubscription());
+                plan.getMaxMoviesPerProfileOnNotActiveSubscription(),
+                createAccountRequest.getFirstName(),
+                createAccountRequest.getLastName());
 
-        accountRepository.save(newAccount);
-        return mapToResponse(newAccount);
+        Account savedAccount = accountRepository.save(newAccount);
+        return mapToResponse(savedAccount);
     }
 
     @Override
@@ -191,10 +194,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void activateAccount(String userId, boolean verified) {
+    public void verifyAccount(String userId, boolean verified) {
         Account account = accountRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("Account not found"));
-        account.setVerified(verified);
+        account.verifyAccount(verified);
         accountRepository.save(account);
     }
 
@@ -203,9 +206,12 @@ public class AccountServiceImpl implements AccountService {
         return AccountResponse.builder()
                 .currentAccountPlanName(account.getPlanName())
                 .accountId(account.getId())
+                .accountVerified(account.isVerified())
+                .lastName(account.getLastName())
+                .firstName(account.getFirstName())
+                .role(Role.USER.name())
                 .hasActiveSubscription(account.isHasActiveSubscription())
                 .profiles(account.getProfiles())
-                .accountStatus(AccountStatus.ACTIVE.name())
                 .build();
     }
 

@@ -6,7 +6,6 @@ import com.movienetscape.accountmanagementservice.messaging.event.AccountVerifie
 import com.movienetscape.accountmanagementservice.service.contract.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +23,8 @@ public class AccountKafkaEventListener {
     public void handleUserRegisteredEvent(String eventJson) {
         try {
             AccountVerifiedEvent event = objectMapper.readValue(eventJson, AccountVerifiedEvent.class);
-            log.info("Received UserVerifiedEvent for user Id: {}", event.getAccountId());
-            accountService.activateAccount(event.getAccountId(),event.isVerified());
+            log.info("Received UserVerifiedEvent for user Id: {}", event.getUserId());
+            accountService.verifyAccount(event.getUserId(),event.isVerified());
         } catch (JsonProcessingException e) {
             log.error("Failed to deserialize UserVerifiedEvent: {}", eventJson, e);
         } catch (RuntimeException e) {

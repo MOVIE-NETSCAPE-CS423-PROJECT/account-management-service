@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountVerifiedEvent {
 
-    private String accountId;
+    private String userId;
     private boolean verified;
 }

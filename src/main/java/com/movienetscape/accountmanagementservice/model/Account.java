@@ -1,6 +1,7 @@
 package com.movienetscape.accountmanagementservice.model;
 
 import com.movienetscape.accountmanagementservice.dto.request.Plan;
+import com.movienetscape.accountmanagementservice.util.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Access(AccessType.FIELD)
 @Builder
 @Entity
 @Table(name = "accounts", indexes = @Index(name = "idx_user_id", columnList = "userId"))
@@ -20,15 +22,28 @@ public class Account extends BaseEntity {
     @Column(nullable = false)
     private boolean isVerified;
 
+    @Column(nullable = false)
+    private String lastName;
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
     @Column(nullable = false, unique = true)
     private String userId;
 
     @Column(nullable = false)
     private String planName;
+
     @Column(nullable = false)
     private int maxMoviesPerProfileOnActiveSubscription;
+
     @Column(nullable = false)
     private int maxMoviesPerProfileOnNotActiveSubscription;
+
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Profile> profiles = new ArrayList<>();
@@ -42,14 +57,22 @@ public class Account extends BaseEntity {
     @Column(nullable = false)
     private int maxWatchListSize;
 
+
     @Override
     public String generateId() {
         return "mns-act-" + UUID.randomUUID().toString().substring(0, 7);
     }
 
-    public void initializeAccount(String planName, int maxMoviesPerProfileOnActiveSubscription, int maxMoviesPerProfileOnNotActiveSubscription) {
+    public void initializeAccount(String planName,
+                                  String userId,
+                                  int maxMoviesPerProfileOnActiveSubscription,
+                                  int maxMoviesPerProfileOnNotActiveSubscription,
+                                  String firstName, String lastName) {
+        this.userId = userId;
         this.isVerified = false;
         this.planName = planName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.maxMoviesPerProfileOnActiveSubscription = maxMoviesPerProfileOnActiveSubscription;
         this.maxMoviesPerProfileOnNotActiveSubscription = maxMoviesPerProfileOnNotActiveSubscription;
         this.hasActiveSubscription = false;
@@ -57,7 +80,7 @@ public class Account extends BaseEntity {
         if (profiles.isEmpty()) {
             Profile defaultProfile = new Profile();
             defaultProfile.setHasParentalControl(false);
-            defaultProfile.setProfileName("Default");
+            defaultProfile.setProfileName("Primary Profile");
             defaultProfile.setPrimaryProfile(true);
             defaultProfile.setAccount(this);
             profiles.add(defaultProfile);
@@ -66,17 +89,20 @@ public class Account extends BaseEntity {
         setMaxWatchListSizeForProfiles();
     }
 
+    public void verifyAccount(boolean verified) {
+        this.isVerified = verified;
+    }
 
     private int calculateMaxMoviesPerProfile() {
-        int totalMaxMoviesForAccount = switch (planName.toUpperCase()) {
-            case "BASIC", "GOLD", "PREMIUM" ->
-                    hasActiveSubscription ? maxMoviesPerProfileOnActiveSubscription : maxMoviesPerProfileOnNotActiveSubscription;
-            default -> 0;
-        };
+        if (profiles.isEmpty()) return 0;
 
+        int totalMaxMoviesForAccount = hasActiveSubscription
+                ? maxMoviesPerProfileOnActiveSubscription
+                : maxMoviesPerProfileOnNotActiveSubscription;
 
-        return !profiles.isEmpty() ? totalMaxMoviesForAccount / profiles.size() : 0;
+        return totalMaxMoviesForAccount / profiles.size();
     }
+
 
     private void setMaxWatchListSizeForProfiles() {
         int maxMoviesPerProfile = calculateMaxMoviesPerProfile();

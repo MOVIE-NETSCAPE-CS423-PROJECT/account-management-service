@@ -15,6 +15,13 @@ public class CreateAccountRequest {
     @JsonProperty(required = true)
     private String userId;
 
-    private Plan plan;
+    @JsonProperty(required = true)
+    private String firstName;
+
+    @JsonProperty(required = true)
+    private String lastName;
+    
+    @JsonProperty(required = true)
+    private Plan userSelectedPlan;
 
 }
