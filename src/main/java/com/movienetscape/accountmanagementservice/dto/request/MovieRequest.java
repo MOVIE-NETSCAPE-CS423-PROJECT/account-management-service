@@ -18,15 +18,13 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MovieRequest {
 
-    @NotNull(message = "ProfileId cant be null")
     @NotEmpty(message = "ProfileId cant be empty")
     private String profileId;
-
-    @NotNull(message = "MovieId cant be null")
 
     @NotEmpty(message = "MovieId cant be empty")
     private String movieId;
 
+    @NotEmpty(message = "title cant be empty")
     private String title;
 
     private LocalDate buyDate;

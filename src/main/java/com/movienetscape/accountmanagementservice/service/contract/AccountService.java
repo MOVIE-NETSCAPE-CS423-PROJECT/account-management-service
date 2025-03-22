@@ -3,6 +3,7 @@ package com.movienetscape.accountmanagementservice.service.contract;
 import com.movienetscape.accountmanagementservice.dto.request.CreateAccountRequest;
 import com.movienetscape.accountmanagementservice.dto.request.ProfileRequest;
 import com.movienetscape.accountmanagementservice.dto.response.*;
+import com.movienetscape.accountmanagementservice.messaging.event.UpdatedUserEvent;
 
 import java.util.List;
 
@@ -16,6 +17,9 @@ public interface AccountService {
     GetAllAccountResponse getAllAccounts();
 
     AccountResponse getAccount(String username);
+
+
+    void updateAccount(UpdatedUserEvent updatedUserEvent);
 
 
     MigrateAccountPlanResponse migrateAccountPlan(String currentPlanName, String newPlanName, String userId);

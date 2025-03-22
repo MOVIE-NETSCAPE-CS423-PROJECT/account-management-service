@@ -6,6 +6,7 @@ import com.movienetscape.accountmanagementservice.dto.request.CreateAccountReque
 import com.movienetscape.accountmanagementservice.dto.request.MigrateAccountPlanRequest;
 import com.movienetscape.accountmanagementservice.dto.response.*;
 import com.movienetscape.accountmanagementservice.service.contract.AccountService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<AccountCreationResponse> createAccount(@RequestBody CreateAccountRequest request) {
+    public ResponseEntity<AccountCreationResponse> createAccount(@Valid @RequestBody CreateAccountRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(request));
     }
 
@@ -40,7 +41,7 @@ public class AccountController {
 
 
     @PostMapping("/{accountId}/profiles")
-    public ResponseEntity<ProfileResponse> addProfile(@PathVariable String accountId, @RequestBody ProfileRequest profileRequest) {
+    public ResponseEntity<ProfileResponse> addProfile(@PathVariable String accountId, @Valid @RequestBody ProfileRequest profileRequest) {
         return ResponseEntity.ok(accountService.addProfile(accountId, profileRequest));
     }
 
@@ -53,7 +54,7 @@ public class AccountController {
 
 
     @PostMapping("/migrate")
-    public ResponseEntity<MigrateAccountPlanResponse> migrateAccountPlan(@RequestBody MigrateAccountPlanRequest request) {
+    public ResponseEntity<MigrateAccountPlanResponse> migrateAccountPlan( @Valid @RequestBody MigrateAccountPlanRequest request) {
         return ResponseEntity.ok(accountService.migrateAccountPlan(request.getCurrentPlanName(), request.getNewPlanName(), request.getAccountId()));
     }
 
@@ -69,7 +70,9 @@ public class AccountController {
     }
 
     @PutMapping("/{accountId}/profiles/{profileId}")
-    public ResponseEntity<ProfileResponse> updateAccountProfile(@PathVariable String accountId, @PathVariable String profileId, @RequestBody ProfileRequest profileRequest) {
+    public ResponseEntity<ProfileResponse> updateAccountProfile(@PathVariable String accountId,
+                                                                @PathVariable String profileId,
+                                                                @Valid @RequestBody ProfileRequest profileRequest) {
         return ResponseEntity.ok(accountService.updateAccountProfile(accountId, profileId, profileRequest));
     }
 

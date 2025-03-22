@@ -4,6 +4,7 @@ import com.movienetscape.accountmanagementservice.dto.request.Plan;
 import com.movienetscape.accountmanagementservice.util.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,6 +44,12 @@ public class Account extends BaseEntity {
 
     @Column(nullable = false)
     private int maxMoviesPerProfileOnNotActiveSubscription;
+
+    @Column
+    private String profileImageUrl;
+
+    @Embedded
+    private Address address;
 
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)

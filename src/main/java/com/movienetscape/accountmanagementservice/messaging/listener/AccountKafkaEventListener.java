@@ -3,6 +3,7 @@ package com.movienetscape.accountmanagementservice.messaging.listener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.movienetscape.accountmanagementservice.messaging.event.AccountVerifiedEvent;
+import com.movienetscape.accountmanagementservice.messaging.event.UpdatedUserEvent;
 import com.movienetscape.accountmanagementservice.service.contract.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,19 @@ public class AccountKafkaEventListener {
             accountService.verifyAccount(event.getUserId(),event.isVerified());
         } catch (JsonProcessingException e) {
             log.error("Failed to deserialize UserVerifiedEvent: {}", eventJson, e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Something went wrong", e);
+        }
+    }
+
+    @KafkaListener(topics = "user-updated-topic", groupId = "notification-service")
+    public void handleUserUpdatedEvent(String eventJson) {
+        try {
+            UpdatedUserEvent event = objectMapper.readValue(eventJson, UpdatedUserEvent.class);
+            log.info("Received UserUpdatedEvent for user Id: {}", event.getUserId());
+            accountService.updateAccount(event);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to deserialize UserUpdatedEvent: {}", eventJson, e);
         } catch (RuntimeException e) {
             throw new RuntimeException("Something went wrong", e);
         }

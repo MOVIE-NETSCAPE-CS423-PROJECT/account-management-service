@@ -4,6 +4,7 @@ import com.movienetscape.accountmanagementservice.dto.request.CreateAccountReque
 import com.movienetscape.accountmanagementservice.dto.request.Plan;
 import com.movienetscape.accountmanagementservice.dto.request.ProfileRequest;
 import com.movienetscape.accountmanagementservice.dto.response.*;
+import com.movienetscape.accountmanagementservice.messaging.event.UpdatedUserEvent;
 import com.movienetscape.accountmanagementservice.model.Account;
 import com.movienetscape.accountmanagementservice.model.Profile;
 import com.movienetscape.accountmanagementservice.repository.AccountRepository;
@@ -63,6 +64,14 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new NotFoundException("no account with this email exists"));
 
         return mapAccountToResponse(account);
+    }
+
+    @Override
+    public void updateAccount(UpdatedUserEvent updatedUserEvent) {
+        Account account = accountRepository.findByUserId(updatedUserEvent.getUserId())
+                .orElseThrow(() -> new NotFoundException("Invalid account id"));
+
+        accountRepository.save(updatedUserEvent.toEntity(account));
     }
 
 
